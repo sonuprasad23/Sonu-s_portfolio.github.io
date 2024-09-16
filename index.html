@@ -1,0 +1,269 @@
+import React, { useEffect, useRef, useState } from 'react';
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { Mail, Linkedin, Instagram, GitHub } from 'lucide-react';
+
+export default function Component() {
+  const mountRef = useRef<HTMLDivElement>(null);
+  const [activeSection, setActiveSection] = useState('profile');
+
+  useEffect(() => {
+    if (!mountRef.current) return;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ alpha: true });
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    mountRef.current.appendChild(renderer.domElement);
+
+    const geometry = new THREE.TorusKnotGeometry(10, 3, 100, 16);
+    const material = new THREE.MeshNormalMaterial();
+    const torusKnot = new THREE.Mesh(geometry, material);
+    scene.add(torusKnot);
+
+    camera.position.z = 30;
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+
+    const animate = () => {
+      requestAnimationFrame(animate);
+      torusKnot.rotation.x += 0.01;
+      torusKnot.rotation.y += 0.01;
+      controls.update();
+      renderer.render(scene, camera);
+    };
+
+    animate();
+
+    const handleResize = () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      mountRef.current?.removeChild(renderer.domElement);
+    };
+  }, []);
+
+  const handleNavClick = (section: string) => {
+    setActiveSection(section);
+    const element = document.getElementById(section);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const openResume = () => {
+    window.open('https://forms.gle/qb3VpayqPp6JfvNG7', '_blank');
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 text-gray-800">
+      <nav className="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <span className="text-2xl font-bold text-purple-600">Sonu Prasad</span>
+            <div className="hidden md:block">
+              <div className="ml-10 flex items-baseline space-x-4">
+                {['profile', 'about', 'experience', 'projects', 'blog', 'contact'].map((section) => (
+                  <button
+                    key={section}
+                    onClick={() => handleNavClick(section)}
+                    className={`px-3 py-2 rounded-md text-sm font-medium ${
+                      activeSection === section ? 'bg-purple-600 text-white' : 'text-gray-600 hover:bg-purple-100 hover:text-purple-600'
+                    } transition duration-300`}
+                  >
+                    {section.charAt(0).toUpperCase() + section.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div ref={mountRef} className="fixed top-0 left-0 w-full h-full opacity-10" />
+
+      <main className="relative z-10 pt-16">
+        <section id="profile" className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <img
+              src="https://i.ibb.co/1JdQGRC/pfp.png"
+              alt="Sonu Prasad's profile picture"
+              className="w-48 h-48 rounded-full mx-auto mb-8 object-cover shadow-lg"
+            />
+            <h1 className="text-4xl md:text-6xl font-bold mb-4 text-purple-600">Sonu Prasad Mahato</h1>
+            <p className="text-xl md:text-2xl mb-8 text-gray-600">AI/ML Developer</p>
+            <div className="space-x-4">
+              <button
+                onClick={openResume}
+                className="bg-purple-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-purple-700 transition duration-300 shadow-md"
+              >
+                Access Resume
+              </button>
+              <button
+                onClick={() => handleNavClick('contact')}
+                className="bg-white text-purple-600 border border-purple-600 px-6 py-3 rounded-full font-semibold hover:bg-purple-100 transition duration-300 shadow-md"
+              >
+                Contact Info
+              </button>
+            </div>
+            <div className="mt-8 flex justify-center space-x-4">
+              <a href="https://www.linkedin.com/in/sonu-prasad23" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition duration-300">
+                <Linkedin className="w-8 h-8 text-blue-600" />
+              </a>
+              <a href="https://github.com/sonuprasad23" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition duration-300">
+                <GitHub className="w-8 h-8 text-gray-800" />
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <section id="about" className="min-h-screen flex items-center justify-center bg-white py-16">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center text-purple-600">About Me</h2>
+            <div className="flex flex-col md:flex-row items-center mb-8">
+              <img
+                src="https://i.ibb.co/TKZ4Q5p/2nd.jpg"
+                alt="Profile picture"
+                className="w-64 h-64 rounded-full object-cover mb-8 md:mb-0 md:mr-8 shadow-lg"
+              />
+              <div className="text-left">
+                <p className="text-lg mb-4 text-gray-700 leading-relaxed">
+                  I am an evergreen learner and programmer focused on learning new technologies and earning skills. I program in Java and Python as my main languages. I have experience working in Data Analytics, Data Science, ML, coding, and content writing domains.
+                </p>
+                <p className="text-lg mb-4 text-gray-700 leading-relaxed">
+                  I spend most of my time working on projects aimed at harnessing the power of machine learning and Deep Learning. My research interests include data science, computer vision, LLMs, and statistics, and I'm passionate about building solutions around these areas.
+                </p>
+                <p className="text-lg text-gray-700 leading-relaxed">
+                  I love to connect with people and collaborate on interesting projects. Feel free to reach out if you'd like to work together or discuss innovative ideas in AI and ML!
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="experience" className="min-h-screen flex items-center justify-center py-16 bg-gray-50">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center text-purple-600">Experience</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="bg-white p-8 rounded-lg shadow-lg">
+                <h3 className="text-2xl font-semibold mb-6 text-purple-600">Programming Skills</h3>
+                <div className="space-y-4">
+                  {[
+                    { name: 'Python', level: 'Expert', percentage: '90%' },
+                    { name: 'Java', level: 'Intermediate', percentage: '75%' },
+                    { name: 'SQL', level: 'Intermediate', percentage: '70%' },
+                    { name: 'HTML/CSS', level: 'Intermediate', percentage: '60%' },
+                    { name: 'C & C++', level: 'Basic', percentage: '50%' },
+                  ].map((skill) => (
+                    <div key={skill.name}>
+                      <div className="flex justify-between mb-1">
+                        <span className="text-base font-medium text-purple-700">{skill.name}</span>
+                        <span className="text-sm font-medium text-purple-700">{skill.level}</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+                        <div className="bg-purple-600 h-2.5 rounded-full" style={{ width: skill.percentage }}></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="bg-white p-8 rounded-lg shadow-lg">
+                <h3 className="text-2xl font-semibold mb-6 text-purple-600">Experience</h3>
+                <ul className="list-disc list-inside space-y-4 text-gray-700">
+                  <li>
+                    <strong>Data Scientist Intern</strong> - XYZ Company (Jan 2022 - Dec 2022)
+                    <p className="mt-1">Developed machine learning models for predictive analytics, improved model accuracy by 20% through feature engineering and hyperparameter tuning.</p>
+                  </li>
+                  <li>
+                    <strong>Software Developer</strong> - ABC Corp (Jun 2021 - Dec 2021)
+                    <p className="mt-1">Worked on full-stack development, designed and implemented REST APIs, and improved application performance by 30%.</p>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="projects" className="min-h-screen flex items-center justify-center py-16 bg-white">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center text-purple-600">Projects</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[
+                {
+                  title: 'Project One',
+                  description: 'A brief description of Project One.',
+                  imageUrl: 'https://i.ibb.co/1JdQGRC/pfp.png',
+                  link: '#',
+                },
+                {
+                  title: 'Project Two',
+                  description: 'A brief description of Project Two.',
+                  imageUrl: 'https://i.ibb.co/1JdQGRC/pfp.png',
+                  link: '#',
+                },
+                {
+                  title: 'Project Three',
+                  description: 'A brief description of Project Three.',
+                  imageUrl: 'https://i.ibb.co/1JdQGRC/pfp.png',
+                  link: '#',
+                },
+              ].map((project) => (
+                <div key={project.title} className="bg-gray-50 p-6 rounded-lg shadow-lg">
+                  <img
+                    src={project.imageUrl}
+                    alt={project.title}
+                    className="w-full h-48 object-cover mb-4 rounded-lg"
+                  />
+                  <h3 className="text-xl font-semibold mb-2 text-purple-600">{project.title}</h3>
+                  <p className="text-gray-700 mb-4">{project.description}</p>
+                  <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:text-purple-800 transition duration-300">
+                    View Project
+                  </a>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="blog" className="min-h-screen flex items-center justify-center py-16 bg-gray-50">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center text-purple-600">Blog</h2>
+            <p className="text-lg text-gray-700 text-center">Coming Soon!</p>
+          </div>
+        </section>
+
+        <section id="contact" className="min-h-screen flex items-center justify-center py-16 bg-white">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center text-purple-600">Contact</h2>
+            <div className="text-center">
+              <p className="text-lg mb-4 text-gray-700">Feel free to reach out to me through the following channels:</p>
+              <div className="flex justify-center space-x-4">
+                <a href="mailto:sonu@example.com" className="text-gray-700 hover:text-gray-900 transition duration-300">
+                  <Mail className="w-8 h-8 text-gray-700" />
+                </a>
+                <a href="https://www.linkedin.com/in/sonu-prasad23" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-gray-900 transition duration-300">
+                  <Linkedin className="w-8 h-8 text-blue-600" />
+                </a>
+                <a href="https://github.com/sonuprasad23" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-gray-900 transition duration-300">
+                  <GitHub className="w-8 h-8 text-gray-800" />
+                </a>
+                <a href="https://www.instagram.com/sonuprasad" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-gray-900 transition duration-300">
+                  <Instagram className="w-8 h-8 text-pink-600" />
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}
